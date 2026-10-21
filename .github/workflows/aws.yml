@@ -1,51 +1,45 @@
-name: Build and Test
-
-# Manual trigger only - to enable automatic triggers, uncomment one of these:
-# on:
-   push:
-     branches: [ main, develop ]
-   pull_request:
-     branches: [ main ]
-
 on:
   workflow_dispatch:
 
 jobs:
-  test:
+  deploy:
     runs-on: ubuntu-latest
-    
+    environment: aws-secret
+
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-    
-    - name: Install dependencies
-      run: npm ci
-    
-    - name: Run tests
-      run: npm test
-    
-    - name: Build application
-      run: npm run start &
-      
-  build:
-    needs: test
-    runs-on: ubuntu-latest
-    
-    steps:
-    - uses: actions/checkout@v4
-    
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-    
-    - name: Install dependencies
-      run: npm ci
-    
-    - name: Package application
-      run: tar -czf expense-tracker.tar.gz --exclude=node_modules --exclude=.git .
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Zip application
+        run: |
+          zip -r app.zip . -x "*.git*" "test/*"
+
+      - name: Configure AWS credentials manually
+        run: |
+          mkdir -p ~/.aws
+          echo "[default]" > ~/.aws/credentials
+          echo "aws_access_key_id = ${{ secrets.AWS_ACCESS_KEY_ID }}" >> ~/.aws/credentials
+          echo "aws_secret_access_key = ${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> ~/.aws/credentials
+          echo "aws_session_token = ${{ secrets.AWS_SESSION_TOKEN }}" >> ~/.aws/credentials
+          echo "[default]" > ~/.aws/config
+          echo "region = us-east-1" >> ~/.aws/config
+
+      - name: Debug AWS credentials
+        run: cat ~/.aws/credentials
+          
+      - name: Upload to S3
+        run: |
+          aws s3 cp app.zip s3://app-werayuth/app-${{ github.sha }}.zip
+
+      - name: Create new application version
+        run: |
+          aws elasticbeanstalk create-application-version \
+            --application-name "${{ secrets.EB_APP_NAME }}" \
+            --version-label "${{ github.sha }}" \
+            --source-bundle S3Bucket="${{ secrets.S3_BUCKET }}",S3Key="app-${{ github.sha }}.zip"
+
+      - name: Deploy to Elastic Beanstalk environment
+        run: |
+          aws elasticbeanstalk update-environment \
+            --environment-name "${{ secrets.EB_ENV_NAME }}" \
+            --version-label "${{ github.sha }}"
