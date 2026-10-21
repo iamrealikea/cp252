@@ -2,10 +2,10 @@ name: Build and Test
 
 # Manual trigger only - to enable automatic triggers, uncomment one of these:
 # on:
-#   push:
-#     branches: [ main, develop ]
-#   pull_request:
-#     branches: [ main ]
+   push:
+     branches: [ main, develop ]
+   pull_request:
+     branches: [ main ]
 
 on:
   workflow_dispatch:
