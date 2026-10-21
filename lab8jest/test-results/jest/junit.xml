@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="jest tests" tests="6" failures="0" errors="0" time="0.928">
+  <testsuite name="Count user" errors="0" failures="0" skipped="0" timestamp="2026-10-21T04:38:09" time="0.431" tests="6">
+    <testcase classname="Count user default user count" name="Count user default user count" time="0.003">
+    </testcase>
+    <testcase classname="Count user clear user and Count" name="Count user clear user and Count" time="0.001">
+    </testcase>
+    <testcase classname="remove user Remove one" name="remove user Remove one" time="0.001">
+    </testcase>
+    <testcase classname="remove two users Remove two" name="remove two users Remove two" time="0">
+    </testcase>
+    <testcase classname="find user by email Find user email" name="find user by email Find user email" time="0.001">
+    </testcase>
+    <testcase classname="find user by email Not found user email" name="find user by email Not found user email" time="0.001">
+    </testcase>
+  </testsuite>
+</testsuites>
