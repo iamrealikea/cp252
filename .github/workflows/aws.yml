@@ -12,6 +12,7 @@ jobs:
 
       - name: Zip application
         run: |
+          cd lab8jest
           zip -r app.zip . -x "*.git*" "test/*"
 
       - name: Configure AWS credentials manually
