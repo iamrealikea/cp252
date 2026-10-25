@@ -16,7 +16,9 @@ jobs:
     strategy:
       matrix:
         node-version: [24.x]
-        
+    defaults:
+      run:
+        working-directory: ./lab8jest
     steps:
     - uses: actions/checkout@v4
 
